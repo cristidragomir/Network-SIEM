@@ -1,0 +1,26 @@
+services:
+  syslog-ng:
+    image: lscr.io/linuxserver/syslog-ng:latest
+    container_name: syslog-ng
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./syslog/config:/config
+      - ./syslog/log:/var/log
+    ports:
+      - 514:5514/udp
+      - 601:6601/tcp
+      - 6514:6514/tcp
+    restart: unless-stopped
+  ubuntu:
+    image: ubuntu:22.04
+    container_name: SIEM-agent
+    restart: unless-stopped
+    command: bash -c "apt update && apt -y install tcpdump && tcpdump -i eth0"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: "udp://syslog-ng:5514"
+        tag: "{{.Name}}/{{.ID}}"
