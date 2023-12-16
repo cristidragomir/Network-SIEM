@@ -24,3 +24,19 @@ services:
       options:
         syslog-address: udp://logs2.papertrailapp.com:12775
         tag: "{{.Name}}/{{.ID}}"
+
+  ping_scanner:
+    image: ubuntu:22.04
+    container_name: ping_scanner
+    restart: unless-stopped
+    command: bash -c "apt update && apt -y install nmap && nmap -sn ubuntu"
+    depends_on:
+      - ubuntu
+  
+  dos_attacker:
+    image: ubuntu:22.04
+    container_name: ping_scanner
+    restart: unless-stopped
+    command: bash -c "apt update && apt -y install hping3 && hping3 --flood --rand-source ubuntu"
+    depends_on:
+      - ubuntu
