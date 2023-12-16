@@ -29,14 +29,14 @@ services:
     image: ubuntu:22.04
     container_name: ping_scanner
     restart: unless-stopped
-    command: bash -c "apt update && apt -y install nmap && nmap -sn ubuntu"
+    command: bash -c "apt update && apt -y install nmap && nmap -sn ubuntu && sleep 10"
     depends_on:
       - ubuntu
   
-  dos_attacker:
-    image: ubuntu:22.04
-    container_name: dos_attacker
-    restart: unless-stopped
-    command: bash -c "apt update && apt -y install hping3 && hping3 --flood --rand-source ubuntu"
-    depends_on:
-      - ubuntu
+  # dos_attacker:
+  #   image: ubuntu:22.04
+  #   container_name: dos_attacker
+  #   # restart: unless-stopped
+  #   command: bash -c "apt update && apt -y install hping3 && hping3 --flood --rand-source ubuntu"
+  #   depends_on:
+  #     - ubuntu
