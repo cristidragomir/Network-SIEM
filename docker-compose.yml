@@ -22,5 +22,5 @@ services:
     logging:
       driver: syslog
       options:
-        syslog-address: "udp://syslog-ng:5514"
+        syslog-address: udp://logs2.papertrailapp.com:12775
         tag: "{{.Name}}/{{.ID}}"
