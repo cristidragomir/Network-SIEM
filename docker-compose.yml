@@ -1,29 +1,22 @@
 services:
-  # syslog-ng:
-  #   image: lscr.io/linuxserver/syslog-ng:latest
-  #   container_name: syslog-ng
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - TZ=Etc/UTC
-  #   volumes:
-  #     - ./syslog/config:/config
-  #     - ./syslog/log:/var/log
-  #   ports:
-  #     - 514:5514/udp
-  #     - 601:6601/tcp
-  #     - 6514:6514/tcp
-  #   restart: unless-stopped
-
   ubuntu:
-    image: ubuntu:22.04
+    image: bkimminich/juice-shop
     container_name: SIEM-agent
     restart: unless-stopped
-    command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0"
+    ports:
+      - "3000:3000"
+
+  tcpdump:
+    image: ubuntu:22.04
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0 -A -s0 -l"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: "service:ubuntu"
     logging:
       driver: syslog
       options:
-        syslog-address: udp://logs2.papertrailapp.com:12775
+        syslog-address: udp://logs5.papertrailapp.com:40187
         tag: "{{.Name}}/{{.ID}}"
 
   ping_scanner:
@@ -33,7 +26,8 @@ services:
     command: bash -c "apt update > /dev/null 2>&1 && apt -y install nmap > /dev/null 2>&1 && nmap -sn ubuntu && sleep 10"
     depends_on:
       - ubuntu
-  
+
+
   # dos_attacker:
   #   image: ubuntu:22.04
   #   container_name: dos_attacker
