@@ -8,7 +8,7 @@ services:
 
   tcpdump:
     image: ubuntu:22.04
-    command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0 -A -s0 -l"
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0 -A -s0 -l -nn"
     cap_add:
       - NET_ADMIN
       - NET_RAW
