@@ -6,6 +6,13 @@ services:
     ports:
       - "3000:3000"
 
+  victim_ubuntu:
+    image: ubuntu:22.04
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install netcat > /dev/null 2>&1 && netcat -l -p 55111"
+    # restart: unless-stopped
+    ports:
+      - "55111:55111"
+
   tcpdump:
     image: ubuntu:22.04
     command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0 -A -s0 -l -nn"
@@ -18,6 +25,30 @@ services:
       options:
         syslog-address: udp://logs5.papertrailapp.com:40187
         tag: "{{.Name}}/{{.ID}}"
+
+  victim_tcpdump:
+    image: ubuntu:22.04
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install tcpdump > /dev/null 2>&1 && tcpdump -i eth0 -A -s0 -l -nn"
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    network_mode: "service:victim_ubuntu"
+    logging:
+      driver: syslog
+      options:
+        syslog-address: udp://logs6.papertrailapp.com:45322
+        tag: "{{.Name}}/{{.ID}}"
+    depends_on:
+      - victim_ubuntu  
+
+  unusual_port_attack:
+    image: ubuntu:22.04
+    container_name: unusual_port_attack
+    # restart: unless-stopped
+    command: bash -c "apt update > /dev/null 2>&1 && apt -y install netcat > /dev/null 2>&1 && sleep 20 && (echo 'Hello from client' | nc victim_ubuntu 55111)"
+    depends_on:
+      - victim_ubuntu
+      - victim_tcpdump
 
   ping_scanner:
     image: ubuntu:22.04
